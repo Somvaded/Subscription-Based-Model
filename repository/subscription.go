@@ -63,3 +63,12 @@ func DeleteSubscription(ctx context.Context,userID string, DB *gorm.DB) error {
 	})
 	return err
 }
+
+func ExpireDueSubscriptions(DB *gorm.DB) {
+	DB.Model(&models.Subscription{}).
+		Where("status = ? AND end_date < ?", "ACTIVE", time.Now()).
+		Updates(map[string]interface{}{
+			"status":     "EXPIRED",
+			"updated_at": time.Now(),
+		})
+}
